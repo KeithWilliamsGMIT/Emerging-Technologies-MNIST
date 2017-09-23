@@ -6,32 +6,54 @@
 
 import gzip
 
-# Read next four bytes from the file.
+# Read the next given number of bytes from the file.
 # Convert these bytes to an int.
 # Return the integer value.
-def get_next_integer():
-	value = file.read(4)
+def get_next_integer(number_of_bytes):
+	value = file.read(number_of_bytes)
 	return int.from_bytes(value, byteorder='big')
+
+# Read the next image in the file.
+# Return a 2D array of integers representing the pixels in the image.
+# According to the MNIST website:
+#	"Pixels are organized row-wise. Pixel values are 0 to 255. 0 means background (white), 255 means foreground (black)."
+def get_next_image(rows, cols):
+	pixels = []
+	
+	for i in range(rows):
+		row = []
+		
+		for j in range(cols):
+			pixel = get_next_integer(1)
+			row.append(pixel)
+		
+		print(row)
+		pixels.append(row)
+	
+	return pixels
 
 # Open the gzip in read mode
 file = gzip.open('data/t10k-images-idx3-ubyte.gz', 'rb')
 
 # Read the first four bytes i.e. the magic number
-magic = get_next_integer()
+magic = get_next_integer(4)
 
 # Read the next four bytes i.e. the number of images
-images = get_next_integer()
+images = get_next_integer(4)
 
 # Read the next four bytes i.e. the number of rows
-rows = get_next_integer()
+rows = get_next_integer(4)
 
 # Read the next four bytes i.e. the number of cols
-cols = get_next_integer()
+cols = get_next_integer(4)
 
 print(magic)
 print(images)
 print(rows)
 print(cols)
+
+# Read the first image in the file.
+image = get_next_image(rows, cols)
 
 # Close the gzip file
 file.close();
