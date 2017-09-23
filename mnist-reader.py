@@ -6,15 +6,32 @@
 
 import gzip
 
+# Read next four bytes from the file.
+# Convert these bytes to an int.
+# Return the integer value.
+def get_next_integer():
+	value = file.read(4)
+	return int.from_bytes(value, byteorder='big')
+
 # Open the gzip in read mode
 file = gzip.open('data/t10k-images-idx3-ubyte.gz', 'rb')
 
 # Read the first four bytes i.e. the magic number
-magic = file.read(4)
+magic = get_next_integer()
 
-# Convert the magic number from bytes to an int
-magic = int.from_bytes(magic, byteorder='big')
+# Read the next four bytes i.e. the number of images
+images = get_next_integer()
+
+# Read the next four bytes i.e. the number of rows
+rows = get_next_integer()
+
+# Read the next four bytes i.e. the number of cols
+cols = get_next_integer()
 
 print(magic)
+print(images)
+print(rows)
+print(cols)
 
+# Close the gzip file
 file.close();
