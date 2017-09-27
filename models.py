@@ -8,16 +8,17 @@ import gzip
 
 class MnistDataSet:
 	# __init__ is called when the object is created.
-	# Assign values to this objects images_file_path and labels_file_path values.
+	# Assign values to this objects images_file_path, labels_file_path and labelled_images values.
 	def __init__(self, images_file_path, labels_file_path):
 		self.images_file_path = images_file_path
 		self.labels_file_path = labels_file_path
+		self.labelled_images = []
 	
 	def parse_files(self):
-		# Open the gzip in read mode.
+		# Open the image gzip in read mode.
 		images_file = gzip.open(self.images_file_path, 'rb')
 
-		# Read the first four bytes i.e. the magic number.
+		# Read the first four bytes i.e. the magic number (should be 2051).
 		magic = self.read_next_integer_from_file(images_file, 4)
 
 		# Read the next four bytes i.e. the number of images.
@@ -29,17 +30,31 @@ class MnistDataSet:
 		# Read the next four bytes i.e. the number of cols.
 		cols = self.read_next_integer_from_file(images_file, 4)
 
-		# Read all the images in the images file.
-		images = self.read_all_images(images_file, number_of_images, rows, cols)
-
 		print("Magic number: " + str(magic))
 		print("Number of images: " + str(number_of_images))
 		print("Number of rows: " + str(rows))
 		print("Number of cols: " + str(cols))
-		print("Total images read: " + str(len(images)))
+		
+		# Open the label gzip in read mode.
+		labels_file = gzip.open(self.labels_file_path, 'rb')
 
-		# Close the gzip file.
+		# Read the first four bytes i.e. the magic number (should be 2049).
+		magic = self.read_next_integer_from_file(labels_file, 4)
+
+		# Read the next four bytes i.e. the number of labels.
+		number_of_labels = self.read_next_integer_from_file(labels_file, 4)
+
+		print("Magic number: " + str(magic))
+		print("Number of labels: " + str(number_of_labels))
+		
+		# Read all the images and labels byte by byte.
+		self.read_all_labelled_images(images_file, labels_file, number_of_images, rows, cols)
+		
+		# Close the label gzip file.
 		images_file.close()
+		
+		# Close the image gzip file.
+		labels_file.close()
 	
 	# Read the next given number of bytes from the given file.
 	# Convert these bytes to an int and return the integer value.
@@ -65,16 +80,12 @@ class MnistDataSet:
 
 		return pixels
 
-	# Read all the images in the given file.
-	# Return a list of LabelledImage object.
-	def read_all_images(self, images_file, number_of_images, rows, cols):
-		images = []
-
-		for i in range(number_of_images):
+	# Read all the images and labels in the given files.
+	def read_all_labelled_images(self, images_file, labels_file, number_of_labelled_images, rows, cols):
+		for i in range(number_of_labelled_images):
 			image = self.read_next_image(images_file, rows, cols)
-			images.append(LabelledImage(image, 0))
-
-		return images
+			label = self.read_next_integer_from_file(labels_file, 1)
+			self.labelled_images.append(LabelledImage(image, label))
 
 class LabelledImage:
 	# __init__ is called when the object is created.
