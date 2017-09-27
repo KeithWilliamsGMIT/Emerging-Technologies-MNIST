@@ -4,6 +4,7 @@
 #	https://stackoverflow.com/questions/12902540/read-from-a-gzip-file-in-python
 #	https://stackoverflow.com/questions/444591/convert-a-string-of-bytes-into-an-int-python
 
+from models import LabelledImage
 import gzip
 
 # Read the next given number of bytes from the file.
@@ -32,13 +33,13 @@ def get_next_image(rows, cols):
 	return pixels
 
 # Read all the images in the file.
-# Return the images in a list.
+# Return a list of LabelledImage object.
 def read_all_images(number_of_images, rows, cols):
 	images = []
 	
 	for i in range(number_of_images):
 		image = get_next_image(rows, cols)
-		images.append(image)
+		images.append(LabelledImage(image, 0))
 	
 	return images
 
@@ -60,11 +61,11 @@ cols = get_next_integer(4)
 # Read all the images in the file.
 images = read_all_images(number_of_images, rows, cols)
 
-print(magic)
-print(number_of_images)
-print(rows)
-print(cols)
-print(len(images))
+print("Magic number: " + str(magic))
+print("Number of images: " + str(number_of_images))
+print("Number of rows: " + str(rows))
+print("Number of cols: " + str(cols))
+print("Total images read: " + str(len(images)))
 
 # Close the gzip file
 file.close()
