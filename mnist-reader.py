@@ -11,3 +11,7 @@ if __name__ == '__main__':
 	print("Parsing test set...")
 	test_set = MnistDataSet('data/t10k-images-idx3-ubyte.gz', 'data/t10k-labels-idx1-ubyte.gz')
 	test_set.parse_files()
+	
+	# Output the third image in the training set to the console.
+	train_set.labelled_images[2].print_to_console()
+	

@@ -93,3 +93,18 @@ class LabelledImage:
 	def __init__(self, image, label):
 		self.image = image
 		self.label = label
+	
+	# Output the image to the console by representing any pixel value less than 128 as a full stop and any other pixel value as a hash symbol.
+	def print_to_console(self):
+		# Draw the image.
+		for i in range(len(self.image)):
+			for j in range(len(self.image[i])):
+				if self.image[i][j] < 128:
+					print('.', end='')
+				else:
+					print('#', end='')
+			
+			print('')
+		
+		# Output the label too.
+		print('Label: ' + str(self.label))
