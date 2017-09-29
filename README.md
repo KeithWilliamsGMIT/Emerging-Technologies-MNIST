@@ -31,8 +31,10 @@ Next, download the following files from the [MNIST website](http://yann.lecun.co
 + test set images (1648877 bytes) 
 + test set labels (4542 bytes)
 
-Create another new folder called images in the root of the repository. Finally, use the following command to run the solution.
+Create another new folder called images in the root of the repository. This solution requires the numpy and pillow libraries. The easiest way to install these is through [Anaconda](https://www.anaconda.com/download/). Finally, use the following command to run the solution.
 
 ```
 python3 mnist-reader.py
 ```
+
+The images from the MNIST dataset will be outputted to the images folder created earlier in PNG format.
