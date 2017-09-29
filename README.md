@@ -17,7 +17,7 @@ Next, download the following files from the [MNIST website](http://yann.lecun.co
 + test set images (1648877 bytes) 
 + test set labels (4542 bytes)
 
-Finally, use the following command to run the solution.
+Create another new folder called images in the root of the repository. Finally, use the following command to run the solution.
 
 ```
 python3 mnist-reader.py

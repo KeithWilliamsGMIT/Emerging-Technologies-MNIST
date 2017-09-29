@@ -5,11 +5,14 @@
 #	https://stackoverflow.com/questions/444591/convert-a-string-of-bytes-into-an-int-python
 
 import gzip
+import numpy as np
+import PIL.Image as pil
 
 class MnistDataSet:
 	# __init__ is called when the object is created.
-	# Assign values to this objects images_file_path, labels_file_path and labelled_images values.
-	def __init__(self, images_file_path, labels_file_path):
+	# Assign values to this objects name, images_file_path, labels_file_path and labelled_images values.
+	def __init__(self, name, images_file_path, labels_file_path):
+		self.name = name
 		self.images_file_path = images_file_path
 		self.labels_file_path = labels_file_path
 		self.labelled_images = []
@@ -86,6 +89,17 @@ class MnistDataSet:
 			image = self.read_next_image(images_file, rows, cols)
 			label = self.read_next_integer_from_file(labels_file, 1)
 			self.labelled_images.append(LabelledImage(image, label))
+	
+	# Save the image as a PNG in a subfolder.
+	# Name the images in the format train-XXXXX-Y.png or test-XXXXX-Y.png
+	# 	1) Where XXXXX is the image number (where it occurs in the data file).
+	#	2) Where Y is its label.
+	# For instance, the five-thousandth training image is labelled 2, so its file name should be train-04999-2.png.
+	def save_png(self, index):
+		img = pil.fromarray(np.array(self.labelled_images[index].image, dtype='uint8'))
+		img = img.convert('RGB')
+		img.show()
+		img.save('images/%s-%05i-%d.png' % (self.name, index, self.labelled_images[index].label))
 
 class LabelledImage:
 	# __init__ is called when the object is created.
@@ -99,12 +113,9 @@ class LabelledImage:
 		# Draw the image.
 		for i in range(len(self.image)):
 			for j in range(len(self.image[i])):
-				if self.image[i][j] < 128:
-					print('.', end='')
-				else:
-					print('#', end='')
+				print('.' if self.image[i][j] < 128 else '#', end='')
 			
-			print('')
+			print()
 		
 		# Output the label too.
 		print('Label: ' + str(self.label))
