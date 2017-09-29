@@ -90,7 +90,12 @@ class MnistDataSet:
 			label = self.read_next_integer_from_file(labels_file, 1)
 			self.labelled_images.append(LabelledImage(image, label))
 	
-	# Save the image as a PNG in a subfolder.
+	# Save all of the labelled images as PNGs.
+	def save_all_images(self):
+		for i in range(len(self.labelled_images)):
+			self.save_png(i)
+	
+	# Save the image at the given index as a PNG in a subfolder called images.
 	# Name the images in the format train-XXXXX-Y.png or test-XXXXX-Y.png
 	# 	1) Where XXXXX is the image number (where it occurs in the data file).
 	#	2) Where Y is its label.
@@ -98,8 +103,7 @@ class MnistDataSet:
 	def save_png(self, index):
 		img = pil.fromarray(np.array(self.labelled_images[index].image, dtype='uint8'))
 		img = img.convert('RGB')
-		img.show()
-		img.save('images/%s-%05i-%d.png' % (self.name, index, self.labelled_images[index].label))
+		img.save('images/%s-%05i-%d.png' % (self.name, index + 1, self.labelled_images[index].label))
 
 class LabelledImage:
 	# __init__ is called when the object is created.

@@ -15,5 +15,6 @@ if __name__ == '__main__':
 	# Output the third image in the training set to the console.
 	train_set.labelled_images[2].print_to_console()
 	
-	# Save the 5000th image from the training image.
-	train_set.save_png(4999)
+	# Save all images in the training and test data sets.
+	train_set.save_all_images()
+	test_set.save_all_images()
