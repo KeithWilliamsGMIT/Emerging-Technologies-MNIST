@@ -4,10 +4,12 @@
 from models import MnistDataSet
 
 if __name__ == '__main__':
+	# Load the training data set.
 	print("Parsing training set...")
 	train_set = MnistDataSet('train', 'data/train-images-idx3-ubyte.gz', 'data/train-labels-idx1-ubyte.gz')
 	train_set.parse_files()
 	
+	# Load the test data set.
 	print("Parsing test set...")
 	test_set = MnistDataSet('test', 'data/t10k-images-idx3-ubyte.gz', 'data/t10k-labels-idx1-ubyte.gz')
 	test_set.parse_files()
