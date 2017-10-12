@@ -10,89 +10,71 @@ import PIL.Image as pil
 
 class MnistDataSet:
 	# __init__ is called when the object is created.
-	# Assign values to this objects name, images_file_path, labels_file_path and labelled_images values.
+	# Assign name and parse given files.
 	def __init__(self, name, images_file_path, labels_file_path):
 		self.name = name
-		self.images_file_path = images_file_path
-		self.labels_file_path = labels_file_path
-		self.labelled_images = []
+		
+		# Parse files to objects.
+		self.parse_images(images_file_path)
+		self.parse_labels(labels_file_path)
 	
-	def parse_files(self):
-		# Open the image gzip in read mode.
-		images_file = gzip.open(self.images_file_path, 'rb')
+	# Parse all images in the given file to a list.
+	def parse_images(self, images_file_path):
+		# Open the image gzip in read bytes mode.
+		with gzip.open(images_file_path, 'rb') as file:
+			# Read the first four bytes i.e. the magic number (should be 2051).
+			magic = int.from_bytes(file.read(4), 'big')
 
-		# Read the first four bytes i.e. the magic number (should be 2051).
-		magic = self.read_next_integer_from_file(images_file, 4)
+			# Read the next four bytes i.e. the number of images.
+			number_of_images = int.from_bytes(file.read(4), 'big')
 
-		# Read the next four bytes i.e. the number of images.
-		number_of_images = self.read_next_integer_from_file(images_file, 4)
+			# Read the next four bytes i.e. the number of rows.
+			rows = int.from_bytes(file.read(4), 'big')
 
-		# Read the next four bytes i.e. the number of rows.
-		rows = self.read_next_integer_from_file(images_file, 4)
+			# Read the next four bytes i.e. the number of cols.
+			cols = int.from_bytes(file.read(4), 'big')
 
-		# Read the next four bytes i.e. the number of cols.
-		cols = self.read_next_integer_from_file(images_file, 4)
-
-		print("Magic number: " + str(magic))
-		print("Number of images: " + str(number_of_images))
-		print("Number of rows: " + str(rows))
-		print("Number of cols: " + str(cols))
-		
-		# Open the label gzip in read mode.
-		labels_file = gzip.open(self.labels_file_path, 'rb')
-
-		# Read the first four bytes i.e. the magic number (should be 2049).
-		magic = self.read_next_integer_from_file(labels_file, 4)
-
-		# Read the next four bytes i.e. the number of labels.
-		number_of_labels = self.read_next_integer_from_file(labels_file, 4)
-
-		print("Magic number: " + str(magic))
-		print("Number of labels: " + str(number_of_labels))
-		
-		# Read all the images and labels byte by byte.
-		self.read_all_labelled_images(images_file, labels_file, number_of_images, rows, cols)
-		
-		# Close the label gzip file.
-		images_file.close()
-		
-		# Close the image gzip file.
-		labels_file.close()
+			print("Magic number: " + str(magic))
+			print("Number of images: " + str(number_of_images))
+			print("Number of rows: " + str(rows))
+			print("Number of cols: " + str(cols))
+			
+			# Read all the images in the file in sequence.
+			# An image in this case is a 2D list of integers representing each pixels in the image.
+			# According to the MNIST website:
+			#	"Pixels are organized row-wise. Pixel values are 0 to 255. 0 means background (white), 255 means foreground (black)."
+			self.images = [[[int.from_bytes(file.read(1), byteorder='big') for i in range(cols)] for j in range(rows)] for k in range(number_of_images)]
 	
-	# Read the next given number of bytes from the given file.
-	# Convert these bytes to an int and return the integer value.
-	def read_next_integer_from_file(self, file, number_of_bytes):
-		value = file.read(number_of_bytes)
-		return int.from_bytes(value, byteorder='big')
+	# Parse all labels in the given file to a list.
+	def parse_labels(self, labels_file_path):
+		# Open the label gzip in read bytes mode.
+		with gzip.open(labels_file_path, 'rb') as file:
+			# Read the first four bytes i.e. the magic number (should be 2049).
+			magic = int.from_bytes(file.read(4), 'big')
 
-	# Read the next image in the given file.
-	# Return a 2D list of integers representing the pixels in the image.
-	# According to the MNIST website:
-	#	"Pixels are organized row-wise. Pixel values are 0 to 255. 0 means background (white), 255 means foreground (black)."
-	def read_next_image(self, images_file, rows, cols):
-		pixels = []
+			# Read the next four bytes i.e. the number of labels.
+			number_of_labels = int.from_bytes(file.read(4), 'big')
 
-		for i in range(rows):
-			row = []
-
-			for j in range(cols):
-				pixel = self.read_next_integer_from_file(images_file, 1)
-				row.append(pixel)
-
-			pixels.append(row)
-
-		return pixels
-
-	# Read all the images and labels in the given files.
-	def read_all_labelled_images(self, images_file, labels_file, number_of_labelled_images, rows, cols):
-		for i in range(number_of_labelled_images):
-			image = self.read_next_image(images_file, rows, cols)
-			label = self.read_next_integer_from_file(labels_file, 1)
-			self.labelled_images.append(LabelledImage(image, label))
+			print("Magic number: " + str(magic))
+			print("Number of labels: " + str(number_of_labels))
+			
+			self.labels = [int.from_bytes(file.read(1), 'big') for i in range(number_of_labels)]
+	
+	# Output the image to the console by representing any pixel value less than 128 as a full stop and any other pixel value as a hash symbol.
+	def print_to_console(self, index):
+		# Draw the image.
+		for i in range(len(self.images[index])):
+			for j in range(len(self.images[index][i])):
+				print('.' if self.images[index][i][j] < 128 else '#', end='')
+			
+			print()
+		
+		# Output the label too.
+		print('Label: ' + str(self.labels[index]))
 	
 	# Save all of the labelled images as PNGs.
 	def save_all_images(self):
-		for i in range(len(self.labelled_images)):
+		for i in range(len(self.images)):
 			self.save_png(i)
 	
 	# Save the image at the given index as a PNG in a subfolder called images.
@@ -101,25 +83,6 @@ class MnistDataSet:
 	#	2) Where Y is its label.
 	# For instance, the five-thousandth training image is labelled 2, so its file name should be train-04999-2.png.
 	def save_png(self, index):
-		img = pil.fromarray(np.array(self.labelled_images[index].image, dtype='uint8'))
+		img = pil.fromarray(np.array(self.images[index], dtype='uint8'))
 		img = img.convert('RGB')
-		img.save('images/%s-%05i-%d.png' % (self.name, index + 1, self.labelled_images[index].label))
-
-class LabelledImage:
-	# __init__ is called when the object is created.
-	# Assign values to this objects image and label values.
-	def __init__(self, image, label):
-		self.image = image
-		self.label = label
-	
-	# Output the image to the console by representing any pixel value less than 128 as a full stop and any other pixel value as a hash symbol.
-	def print_to_console(self):
-		# Draw the image.
-		for i in range(len(self.image)):
-			for j in range(len(self.image[i])):
-				print('.' if self.image[i][j] < 128 else '#', end='')
-			
-			print()
-		
-		# Output the label too.
-		print('Label: ' + str(self.label))
+		img.save('images/%s-%05i-%d.png' % (self.name, index, self.labels[index]))
