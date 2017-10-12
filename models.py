@@ -3,6 +3,7 @@
 # Adapted from:
 #	https://stackoverflow.com/questions/12902540/read-from-a-gzip-file-in-python
 #	https://stackoverflow.com/questions/444591/convert-a-string-of-bytes-into-an-int-python
+#	https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/learn/python/learn/datasets/mnist.py
 
 import gzip
 import numpy as np
@@ -43,8 +44,16 @@ class MnistDataSet:
 			# An image in this case is a 2D list of integers representing each pixels in the image.
 			# According to the MNIST website:
 			#	"Pixels are organized row-wise. Pixel values are 0 to 255. 0 means background (white), 255 means foreground (black)."
-			self.images = [[[int.from_bytes(file.read(1), byteorder='big') for i in range(cols)] for j in range(rows)] for k in range(number_of_images)]
-	
+			#self.images = [[[int.from_bytes(file.read(1), byteorder='big') for i in range(cols)] for j in range(rows)] for k in range(number_of_images)]
+			
+			# Using the above line which uses nested for loops to read in images from the data file took approximately 3 minutes for both datasets.
+			# After investigating the mnist script used by tensorflow I found the below method.
+			# This reads in the remained of the file to a buffer that is this turned into a 3D list.
+			# This method reduced the time to approximately 0.5 seconds for both datasets.
+			buffer = file.read(rows * cols * number_of_images)
+			data = np.frombuffer(buffer, dtype=np.uint8)
+			self.images = data.reshape(number_of_images, rows, cols)
+			
 	# Parse all labels in the given file to a list.
 	def parse_labels(self, labels_file_path):
 		# Open the label gzip in read bytes mode.
@@ -58,7 +67,12 @@ class MnistDataSet:
 			print("Magic number: " + str(magic))
 			print("Number of labels: " + str(number_of_labels))
 			
-			self.labels = [int.from_bytes(file.read(1), 'big') for i in range(number_of_labels)]
+			#self.labels = [int.from_bytes(file.read(1), 'big') for i in range(number_of_labels)]
+			
+			# The remaining bytes in the label data file is read into a buffer.
+			# This buffer is then turned into a list.
+			buffer = file.read(number_of_labels)
+			self.labels = np.frombuffer(buffer, dtype=np.uint8)
 	
 	# Output the image to the console by representing any pixel value less than 128 as a full stop and any other pixel value as a hash symbol.
 	def print_to_console(self, index):
@@ -83,6 +97,6 @@ class MnistDataSet:
 	#	2) Where Y is its label.
 	# For instance, the five-thousandth training image is labelled 2, so its file name should be train-04999-2.png.
 	def save_png(self, index):
-		img = pil.fromarray(np.array(self.images[index], dtype='uint8'))
+		img = pil.fromarray(self.images[index])
 		img = img.convert('RGB')
 		img.save('images/%s-%05i-%d.png' % (self.name, index, self.labels[index]))

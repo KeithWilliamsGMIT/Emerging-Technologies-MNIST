@@ -21,5 +21,7 @@ if __name__ == '__main__':
 	train_set.print_to_console(2)
 	
 	# Save all images in the training and test data sets.
+	
+	print('Saving all images...')
 	train_set.save_all_images()
 	test_set.save_all_images()
