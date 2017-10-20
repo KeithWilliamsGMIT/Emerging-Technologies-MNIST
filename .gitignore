@@ -1,8 +1,10 @@
-# Ignore data files
-data/
+# Ignore data files except for .gitkeep
+data/*
+!data/.gitkeep
 
-# Ignore image files
-images/
+# Ignore image files except for .gitkeep
+images/*
+!images/.gitkeep
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

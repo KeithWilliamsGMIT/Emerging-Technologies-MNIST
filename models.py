@@ -9,9 +9,14 @@ import gzip
 import numpy as np
 import PIL.Image as pil
 
+# Correct magic number values.
 IMAGE_MAGIC_NUMBER = 2051
 LABEL_MAGIC_NUMBER = 2049
 
+# A model of a MNIST data set.
+# This can be used for both the training and test data sets.
+# It stores the name of the data set, an array of images and an array of labels.
+# Tt also contains functions to print an image to the console and save the images as PNGs.
 class MnistDataSet:
 	# __init__ is called when the object is created.
 	# Assign name and parse given files.

@@ -18,23 +18,26 @@ Use Python to output the image files as PNGs, saving them in a subfolder in your
 
 ## Getting Started
 
-Clone the repository and navigate to the root of the repository.
+Clone the repository and navigate to the root.
 
 ```
 git clone https://github.com/KeithWilliamsGMIT/Emerging-Technologies-MNIST.git
 cd Emerging-Technologies-MNIST
 ```
 
-Next, download the following files from the [MNIST website](http://yann.lecun.com/exdb/mnist/) into a folder called data in the root of the repository.
-+ training set images (9912422 bytes)
-+ training set labels (28881 bytes)
-+ test set images (1648877 bytes)
-+ test set labels (4542 bytes)
+Next, download the following files from the [MNIST website](http://yann.lecun.com/exdb/mnist/) into the data folder at the root of the repository.
 
-Create another new folder called images in the root of the repository. This solution requires the numpy and pillow libraries. The easiest way to install these is through [Anaconda](https://www.anaconda.com/download/). Finally, use the following command to run the solution.
+| Description         | Size            | Save as                    |
+|---------------------|-----------------|----------------------------|
+| training set images | (9912422 bytes) | train-images-idx3-ubyte.gz |
+| training set labels | (28881 bytes)   | train-labels-idx1-ubyte.gz |
+| test set images     | (1648877 bytes) | t10k-images-idx3-ubyte.gz  |
+| test set labels     | (4542 bytes)    | t10k-labels-idx1-ubyte.gz  |
+
+Note that the files must be saved as the name provided in the above table. This solution requires the numpy and pillow libraries. The easiest way to install these is through [Anaconda](https://www.anaconda.com/download/). Finally, use the following command to run the solution.
 
 ```
 python3 mnist-reader.py
 ```
 
-The images from the MNIST dataset will be outputted to the images folder created earlier in PNG format.
+The images from the MNIST dataset will be outputted in PNG format to the images folder at the root of the repository.
