@@ -9,6 +9,9 @@ import gzip
 import numpy as np
 import PIL.Image as pil
 
+IMAGE_MAGIC_NUMBER = 2051
+LABEL_MAGIC_NUMBER = 2049
+
 class MnistDataSet:
 	# __init__ is called when the object is created.
 	# Assign name and parse given files.
@@ -23,8 +26,12 @@ class MnistDataSet:
 	def parse_images(self, images_file_path):
 		# Open the image gzip in read bytes mode.
 		with gzip.open(images_file_path, 'rb') as file:
-			# Read the first four bytes i.e. the magic number (should be 2051).
+			# Read the first four bytes i.e. the magic number.
 			magic = int.from_bytes(file.read(4), 'big')
+			
+			# Raise an exception if the magic number is incorrect (should be 2051).
+			if magic != IMAGE_MAGIC_NUMBER:
+				raise ValueError('Incorrect magic number value %d in MNIST image file %s! Correct value is %d.' % (magic, images_file_path, IMAGE_MAGIC_NUMBER))
 
 			# Read the next four bytes i.e. the number of images.
 			number_of_images = int.from_bytes(file.read(4), 'big')
@@ -46,9 +53,9 @@ class MnistDataSet:
 			#	"Pixels are organized row-wise. Pixel values are 0 to 255. 0 means background (white), 255 means foreground (black)."
 			#self.images = [[[int.from_bytes(file.read(1), byteorder='big') for i in range(cols)] for j in range(rows)] for k in range(number_of_images)]
 			
-			# Using the above line which uses nested for loops to read in images from the data file took approximately 3 minutes for both datasets.
-			# After investigating the mnist script used by tensorflow I found the below method.
-			# This reads in the remained of the file to a buffer that is this turned into a 3D list.
+			# Using the above line, which uses nested for loops to read in images from the data file, took approximately 3 minutes for both datasets to be parsed.
+			# After investigating the MNIST script used by tensorflow I found the below method.
+			# This reads in the remainder of the file to a buffer that is then turned into a 3D list.
 			# This method reduced the time to approximately 0.5 seconds for both datasets.
 			buffer = file.read(rows * cols * number_of_images)
 			data = np.frombuffer(buffer, dtype=np.uint8)
@@ -58,8 +65,12 @@ class MnistDataSet:
 	def parse_labels(self, labels_file_path):
 		# Open the label gzip in read bytes mode.
 		with gzip.open(labels_file_path, 'rb') as file:
-			# Read the first four bytes i.e. the magic number (should be 2049).
+			# Read the first four bytes i.e. the magic number.
 			magic = int.from_bytes(file.read(4), 'big')
+			
+			# Raise an exception if the magic number is incorrect (should be 2049).
+			if magic != LABEL_MAGIC_NUMBER:
+				raise ValueError('Incorrect magic number value %d in MNIST label file %s! Correct value is %d.' % (magic, labels_file_path, LABEL_MAGIC_NUMBER))
 
 			# Read the next four bytes i.e. the number of labels.
 			number_of_labels = int.from_bytes(file.read(4), 'big')
@@ -74,9 +85,9 @@ class MnistDataSet:
 			buffer = file.read(number_of_labels)
 			self.labels = np.frombuffer(buffer, dtype=np.uint8)
 	
-	# Output the image to the console by representing any pixel value less than 128 as a full stop and any other pixel value as a hash symbol.
+	# Output the image at the given index to the console.
+	# This is achieved by representing any pixel value less than 128 as a full stop and all other pixel value as a hash symbol.
 	def print_to_console(self, index):
-		# Draw the image.
 		for i in range(len(self.images[index])):
 			for j in range(len(self.images[index][i])):
 				print('.' if self.images[index][i][j] < 128 else '#', end='')
@@ -86,7 +97,7 @@ class MnistDataSet:
 		# Output the label too.
 		print('Label: ' + str(self.labels[index]))
 	
-	# Save all of the labelled images as PNGs.
+	# Save all of the images as PNGs.
 	def save_all_images(self):
 		for i in range(len(self.images)):
 			self.save_png(i)

@@ -26,9 +26,9 @@ cd Emerging-Technologies-MNIST
 ```
 
 Next, download the following files from the [MNIST website](http://yann.lecun.com/exdb/mnist/) into a folder called data in the root of the repository.
-+ training set images (9912422 bytes) 
-+ training set labels (28881 bytes) 
-+ test set images (1648877 bytes) 
++ training set images (9912422 bytes)
++ training set labels (28881 bytes)
++ test set images (1648877 bytes)
 + test set labels (4542 bytes)
 
 Create another new folder called images in the root of the repository. This solution requires the numpy and pillow libraries. The easiest way to install these is through [Anaconda](https://www.anaconda.com/download/). Finally, use the following command to run the solution.
